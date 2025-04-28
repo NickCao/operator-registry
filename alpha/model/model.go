@@ -50,6 +50,7 @@ type Package struct {
 	DefaultChannel *Channel
 	Channels       map[string]*Channel
 	Deprecation    *Deprecation
+	Properties     []property.Property
 }
 
 func (m *Package) Validate() error {

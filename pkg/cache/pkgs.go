@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/operator-framework/operator-registry/alpha/model"
+	"github.com/operator-framework/operator-registry/alpha/property"
 	"github.com/operator-framework/operator-registry/pkg/api"
 	"github.com/operator-framework/operator-registry/pkg/registry"
 )
@@ -196,6 +197,7 @@ type cPkg struct {
 	DefaultChannel string      `json:"defaultChannel"`
 	Channels       map[string]cChannel
 	Deprecation    *model.Deprecation `json:"deprecation,omitempty"`
+	Properties     []property.Property
 }
 
 type cChannel struct {
@@ -223,6 +225,7 @@ func packagesFromModel(m model.Model) (map[string]cPkg, error) {
 			DefaultChannel: p.DefaultChannel.Name,
 			Channels:       map[string]cChannel{},
 			Deprecation:    p.Deprecation,
+			Properties:     p.Properties,
 		}
 		for _, ch := range p.Channels {
 			head, err := ch.Head()

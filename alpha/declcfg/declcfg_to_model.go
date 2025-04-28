@@ -31,6 +31,7 @@ func ConvertToModel(cfg DeclarativeConfig) (model.Model, error) {
 			Name:        p.Name,
 			Description: p.Description,
 			Channels:    map[string]*model.Channel{},
+			Properties:  p.Properties,
 		}
 		if p.Icon != nil {
 			mpkg.Icon = &model.Icon{
