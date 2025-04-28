@@ -43,8 +43,8 @@ type backend interface {
 	PutPackageIndex(context.Context, packageIndex) error
 
 	SendBundles(context.Context, registry.BundleSender) error
-	GetBundle(context.Context, bundleKey) (*api.Bundle, error)
-	PutBundle(context.Context, bundleKey, *api.Bundle) error
+	GetBundle(context.Context, BundleKey) (*api.Bundle, error)
+	PutBundle(context.Context, BundleKey, *api.Bundle) error
 
 	GetDigest(context.Context) (string, error)
 	ComputeDigest(context.Context, fs.FS) (string, error)
@@ -192,7 +192,7 @@ func (c *cache) ListBundles(ctx context.Context) ([]*api.Bundle, error) {
 	return bundleSender, nil
 }
 
-func (c *cache) getTrimmedBundle(ctx context.Context, key bundleKey) (*api.Bundle, error) {
+func (c *cache) getTrimmedBundle(ctx context.Context, key BundleKey) (*api.Bundle, error) {
 	apiBundle, err := c.backend.GetBundle(ctx, key)
 	if err != nil {
 		return nil, err
@@ -215,7 +215,7 @@ func (c *cache) GetBundle(ctx context.Context, pkgName, channelName, csvName str
 	if !ok {
 		return nil, fmt.Errorf("package %q, channel %q, bundle %q not found", pkgName, channelName, csvName)
 	}
-	return c.getTrimmedBundle(ctx, bundleKey{pkg.Name, ch.Name, b.Name})
+	return c.getTrimmedBundle(ctx, BundleKey{pkg.Name, ch.Name, b.Name})
 }
 
 func (c *cache) GetBundleForChannel(ctx context.Context, pkgName string, channelName string) (*api.Bundle, error) {
@@ -383,7 +383,7 @@ func (c *cache) processPackage(ctx context.Context, reader io.Reader) (packageIn
 				if err != nil {
 					return nil, err
 				}
-				if err := c.backend.PutBundle(ctx, bundleKey{p.Name, ch.Name, b.Name}, apiBundle); err != nil {
+				if err := c.backend.PutBundle(ctx, BundleKey{p.Name, ch.Name, b.Name}, apiBundle); err != nil {
 					return nil, fmt.Errorf("store bundle %q: %v", b.Name, err)
 				}
 			}
@@ -438,7 +438,7 @@ func writeDigestFile(file string, digest string, mode os.FileMode) error {
 }
 
 func doesBundleProvide(ctx context.Context, getBundle getBundleFunc, pkgName, chName, bundleName, group, version, kind string) (bool, error) {
-	apiBundle, err := getBundle(ctx, bundleKey{pkgName, chName, bundleName})
+	apiBundle, err := getBundle(ctx, BundleKey{pkgName, chName, bundleName})
 	if err != nil {
 		return false, fmt.Errorf("get bundle %q: %v", bundleName, err)
 	}

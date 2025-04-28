@@ -4,13 +4,13 @@ import (
 	"github.com/tidwall/btree"
 )
 
-type bundleKey struct {
+type BundleKey struct {
 	PackageName string
 	ChannelName string
 	Name        string
 }
 
-func bundleKeyComparator(a, b bundleKey) bool {
+func bundleKeyComparator(a, b BundleKey) bool {
 	if a.ChannelName != b.ChannelName {
 		return a.ChannelName < b.ChannelName
 	}
@@ -21,14 +21,14 @@ func bundleKeyComparator(a, b bundleKey) bool {
 }
 
 type bundleKeys struct {
-	t *btree.BTreeG[bundleKey]
+	t *btree.BTreeG[BundleKey]
 }
 
 func newBundleKeys() bundleKeys {
-	return bundleKeys{btree.NewBTreeG[bundleKey](bundleKeyComparator)}
+	return bundleKeys{btree.NewBTreeG[BundleKey](bundleKeyComparator)}
 }
 
-func (b bundleKeys) Set(k bundleKey) {
+func (b bundleKeys) Set(k BundleKey) {
 	b.t.Set(k)
 }
 
@@ -36,7 +36,7 @@ func (b bundleKeys) Len() int {
 	return b.t.Len()
 }
 
-func (b bundleKeys) Walk(f func(k bundleKey) error) error {
+func (b bundleKeys) Walk(f func(k BundleKey) error) error {
 	it := b.t.Iter()
 	for it.Next() {
 		if err := f(it.Item()); err != nil {

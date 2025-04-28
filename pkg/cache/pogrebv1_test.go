@@ -84,7 +84,7 @@ func TestPogrebV1_CheckIntegrity(t *testing.T) {
 			build: true,
 			fbcFS: validFS,
 			mod: func(t *testing.T, tc *testCase, cacheDir string, b backend) {
-				require.NoError(t, b.PutBundle(context.Background(), bundleKey{"foo", "bar", "baz"}, &api.Bundle{PackageName: "foo", ChannelName: "bar", CsvName: "baz"}))
+				require.NoError(t, b.PutBundle(context.Background(), BundleKey{"foo", "bar", "baz"}, &api.Bundle{PackageName: "foo", ChannelName: "bar", CsvName: "baz"}))
 			},
 			expect: func(t *testing.T, err error) {
 				require.Error(t, err)

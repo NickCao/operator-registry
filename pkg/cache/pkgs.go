@@ -69,7 +69,7 @@ func (pkgs packageIndex) GetChannelEntriesThatReplace(_ context.Context, name st
 	return entries, nil
 }
 
-type getBundleFunc func(context.Context, bundleKey) (*api.Bundle, error)
+type getBundleFunc func(context.Context, BundleKey) (*api.Bundle, error)
 
 func (pkgs packageIndex) GetBundleForChannel(ctx context.Context, getBundle getBundleFunc, pkgName string, channelName string) (*api.Bundle, error) {
 	pkg, ok := pkgs[pkgName]
@@ -80,7 +80,7 @@ func (pkgs packageIndex) GetBundleForChannel(ctx context.Context, getBundle getB
 	if !ok {
 		return nil, fmt.Errorf("package %q, channel %q not found", pkgName, channelName)
 	}
-	return getBundle(ctx, bundleKey{pkg.Name, ch.Name, ch.Head})
+	return getBundle(ctx, BundleKey{pkg.Name, ch.Name, ch.Head})
 }
 
 func (pkgs packageIndex) GetBundleThatReplaces(ctx context.Context, getBundle getBundleFunc, name, pkgName, channelName string) (*api.Bundle, error) {
@@ -99,7 +99,7 @@ func (pkgs packageIndex) GetBundleThatReplaces(ctx context.Context, getBundle ge
 	//       implementation to be non-deterministic as well.
 	for _, b := range ch.Bundles {
 		if bundleReplaces(b, name) {
-			return getBundle(ctx, bundleKey{pkg.Name, ch.Name, b.Name})
+			return getBundle(ctx, BundleKey{pkg.Name, ch.Name, b.Name})
 		}
 	}
 	return nil, fmt.Errorf("no entry found for package %q, channel %q", pkgName, channelName)

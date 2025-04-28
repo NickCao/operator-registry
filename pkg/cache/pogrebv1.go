@@ -120,7 +120,7 @@ func (q *pogrebV1Backend) GetPackageIndex(_ context.Context) (packageIndex, erro
 	for _, pkg := range pi {
 		for _, ch := range pkg.Channels {
 			for _, b := range ch.Bundles {
-				q.bundles.Set(bundleKey{PackageName: pkg.Name, ChannelName: ch.Name, Name: b.Name})
+				q.bundles.Set(BundleKey{PackageName: pkg.Name, ChannelName: ch.Name, Name: b.Name})
 			}
 		}
 	}
@@ -135,11 +135,11 @@ func (q *pogrebV1Backend) PutPackageIndex(_ context.Context, index packageIndex)
 	return q.db.Put([]byte("packages.json"), packageJSON)
 }
 
-func (q *pogrebV1Backend) dbKey(in bundleKey) []byte {
+func (q *pogrebV1Backend) dbKey(in BundleKey) []byte {
 	return []byte(fmt.Sprintf("bundles/%s/%s/%s", in.PackageName, in.ChannelName, in.Name))
 }
 
-func (q *pogrebV1Backend) GetBundle(_ context.Context, key bundleKey) (*api.Bundle, error) {
+func (q *pogrebV1Backend) GetBundle(_ context.Context, key BundleKey) (*api.Bundle, error) {
 	d, err := q.db.Get(q.dbKey(key))
 	if err != nil {
 		return nil, err
@@ -151,7 +151,7 @@ func (q *pogrebV1Backend) GetBundle(_ context.Context, key bundleKey) (*api.Bund
 	return &b, nil
 }
 
-func (q *pogrebV1Backend) PutBundle(_ context.Context, key bundleKey, bundle *api.Bundle) error {
+func (q *pogrebV1Backend) PutBundle(_ context.Context, key BundleKey, bundle *api.Bundle) error {
 	d, err := proto.Marshal(bundle)
 	if err != nil {
 		return err
@@ -232,7 +232,7 @@ func (q *pogrebV1Backend) PutDigest(_ context.Context, digest string) error {
 }
 
 func (q *pogrebV1Backend) SendBundles(_ context.Context, s registry.BundleSender) error {
-	return q.bundles.Walk(func(key bundleKey) error {
+	return q.bundles.Walk(func(key BundleKey) error {
 		bundleData, err := q.db.Get(q.dbKey(key))
 		if err != nil {
 			return fmt.Errorf("failed to get data for package %q, channel %q, key %q: %w", key.PackageName, key.ChannelName, key.Name, err)

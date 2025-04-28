@@ -94,7 +94,7 @@ func (q *jsonBackend) GetPackageIndex(_ context.Context) (packageIndex, error) {
 	for _, pkg := range pi {
 		for _, ch := range pkg.Channels {
 			for _, b := range ch.Bundles {
-				q.bundles.Set(bundleKey{PackageName: pkg.Name, ChannelName: ch.Name, Name: b.Name})
+				q.bundles.Set(BundleKey{PackageName: pkg.Name, ChannelName: ch.Name, Name: b.Name})
 			}
 		}
 	}
@@ -112,11 +112,11 @@ func (q *jsonBackend) PutPackageIndex(_ context.Context, pi packageIndex) error 
 	return nil
 }
 
-func (q *jsonBackend) bundleFile(in bundleKey) string {
+func (q *jsonBackend) bundleFile(in BundleKey) string {
 	return filepath.Join(q.baseDir, jsonDir, fmt.Sprintf("%s_%s_%s.json", in.PackageName, in.ChannelName, in.Name))
 }
 
-func (q *jsonBackend) GetBundle(_ context.Context, key bundleKey) (*api.Bundle, error) {
+func (q *jsonBackend) GetBundle(_ context.Context, key BundleKey) (*api.Bundle, error) {
 	d, err := os.ReadFile(q.bundleFile(key))
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (q *jsonBackend) GetBundle(_ context.Context, key bundleKey) (*api.Bundle, 
 	return &b, nil
 }
 
-func (q *jsonBackend) PutBundle(_ context.Context, key bundleKey, bundle *api.Bundle) error {
+func (q *jsonBackend) PutBundle(_ context.Context, key BundleKey, bundle *api.Bundle) error {
 	d, err := json.Marshal(bundle)
 	if err != nil {
 		return err
@@ -166,10 +166,10 @@ func (q *jsonBackend) PutDigest(_ context.Context, digest string) error {
 }
 
 func (q *jsonBackend) SendBundles(_ context.Context, s registry.BundleSender) error {
-	keys := make([]bundleKey, 0, q.bundles.Len())
+	keys := make([]BundleKey, 0, q.bundles.Len())
 	files := make([]*os.File, 0, q.bundles.Len())
 	readers := make([]io.Reader, 0, q.bundles.Len())
-	if err := q.bundles.Walk(func(key bundleKey) error {
+	if err := q.bundles.Walk(func(key BundleKey) error {
 		file, err := os.Open(q.bundleFile(key))
 		if err != nil {
 			return fmt.Errorf("failed to open file for package %q, channel %q, key %q: %w", key.PackageName, key.ChannelName, key.Name, err)
