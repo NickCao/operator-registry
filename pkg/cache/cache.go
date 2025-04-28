@@ -27,6 +27,7 @@ type Cache interface {
 	CheckIntegrity(ctx context.Context, fbc fs.FS) error
 	Build(ctx context.Context, fbc fs.FS) error
 	Load(ctc context.Context) error
+	Backend() backend
 	Close() error
 }
 
@@ -398,6 +399,10 @@ func (c *cache) Load(ctx context.Context) error {
 	}
 	c.packageIndex = pi
 	return nil
+}
+
+func (c *cache) Backend() backend {
+	return c.backend
 }
 
 func (c *cache) Close() error {
